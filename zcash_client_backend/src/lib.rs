@@ -50,39 +50,6 @@
 //!                  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 //! ```
 //!
-//! ## Feature flags
-#![doc = document_features::document_features!()]
-//!
 
-#![cfg_attr(docsrs, feature(doc_cfg))]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
-// Catch documentation errors caused by code changes.
-#![deny(rustdoc::broken_intra_doc_links)]
-// Temporary until we have addressed all Result<T, ()> cases.
-#![allow(clippy::result_unit_err)]
-
-pub use zcash_keys::address;
-pub mod data_api;
-mod decrypt;
-pub use zcash_keys::encoding;
-pub mod fees;
-pub use zcash_keys::keys;
-pub mod proposal;
-pub mod proto;
-pub mod scan;
-pub mod scanning;
-pub mod wallet;
-pub use zip321;
-
-#[cfg(feature = "sync")]
-pub mod sync;
-
-#[cfg(feature = "unstable-serialization")]
 pub mod serialization;
 
-pub use decrypt::{decrypt_transaction, DecryptedOutput, TransferType};
-pub use zcash_protocol::{PoolType, ShieldedProtocol};
-
-#[cfg(test)]
-#[macro_use]
-extern crate assert_matches;
