@@ -13,7 +13,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 zcash_primitives = { version = "0.15.1", default-features= false }
 zcash_encoding = { version = "0.2.0", default-features = false }
-shardtree = "0.3"
+shardtree = "0.3.2"
 byteorder = "1"
 
 [lib]
