@@ -5,6 +5,10 @@ on:
   push:
     branches: main
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   test:
     name: >
