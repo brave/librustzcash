@@ -22,9 +22,8 @@ extern crate std;
 #[macro_use]
 extern crate alloc;
 
-pub mod block;
+// Brave: `block` and `extensions` are trimmed; brave-core only consumes the
+// `merkle_tree` and Orchard `transaction` serialization surface.
 pub(crate) mod encoding;
-#[cfg(zcash_unstable = "zfuture")]
-pub mod extensions;
 pub mod merkle_tree;
 pub mod transaction;
