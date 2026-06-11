@@ -14,16 +14,16 @@ license = "MPL-2.0"
 # Brave: this crate is trimmed to only the `merkle_tree` and `transaction`
 # (Orchard bundle + amount) surface consumed by brave-core's Orchard wallet
 # code. Sapling, transparent, proofs and the rest of upstream zcash_primitives
-# are removed to avoid pulling in their dependency trees.
+# are removed to avoid pulling in their dependency trees. The dependencies
+# below cover exactly the compiled (trimmed) module graph.
 [dependencies]
 orchard = { version = "0.14", default-features = false }
 incrementalmerkletree = { version = "0.8.2", features = ["legacy-api"] }
 zcash_protocol = { version = "0.9", default-features = false }
 zcash_encoding = { version = "0.4", default-features = false }
-zcash_note_encryption = { version = "0.4.1", features = ["pre-zip-212"] }
-memuse = "0.2"
+blake2b_simd = { version = "1", default-features = false }
+corez = { version = "0.1.1", default-features = false, features = ["alloc"] }
 nonempty = "0.11"
-byteorder = "1"
 
 [lib]
 name = "zcash_primitives"
