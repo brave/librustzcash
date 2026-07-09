@@ -16,7 +16,7 @@ license = "MPL-2.0"
 # code. Sapling, transparent, proofs and the rest of upstream zcash_primitives
 # are removed to avoid pulling in their dependency trees.
 [dependencies]
-orchard = { version = "0.14", default-features = false }
+orchard = { version = "0.15.0-pre.2", default-features = false }
 incrementalmerkletree = { version = "0.8.2", features = ["legacy-api"] }
 zcash_protocol = { version = "0.9", default-features = false }
 zcash_encoding = { version = "0.4", default-features = false }
