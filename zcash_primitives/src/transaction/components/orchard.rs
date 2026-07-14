@@ -9,7 +9,7 @@ use nonempty::NonEmpty;
 
 use orchard::{
     Action, Anchor,
-    bundle::{Authorization, Authorized, Flags, ProofSizeEnforcement},
+    bundle::{Authorization, Authorized, BundleVersion, Flags},
     note::{ExtractedNoteCommitment, Nullifier, TransmittedNoteCiphertext},
     primitives::redpallas::{self, SigType, Signature, SpendAuth, VerificationKey},
     value::ValueCommitment,
@@ -50,7 +50,6 @@ impl MapAuth<Authorized, Authorized> for () {
 /// Reads an [`orchard::Bundle`] from a v5 transaction format.
 pub fn read_v5_bundle<R: Read>(
     mut reader: R,
-    proof_size_enforcement: ProofSizeEnforcement,
 ) -> io::Result<Option<orchard::Bundle<Authorized, ZatBalance>>> {
     #[allow(clippy::redundant_closure)]
     let actions_without_auth = Vector::read(&mut reader, |r| read_action_without_auth(r))?;
@@ -75,15 +74,13 @@ pub fn read_v5_bundle<R: Read>(
             binding_signature,
         );
 
-        // `try_from_parts` rejects a proof whose length is not the canonical size for the
-        // number of actions, preventing a proof padded with arbitrary data (GHSA-2x4w-pxqw-58v9).
         orchard::Bundle::try_from_parts(
             actions,
             flags,
             value_balance,
             anchor,
             authorization,
-            proof_size_enforcement,
+            BundleVersion::orchard_insecure_v1(),
         )
         .map(Some)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
@@ -94,7 +91,7 @@ pub fn read_v5_bundle<R: Read>(
 pub fn read_v6_bundle<R: Read>(
     reader: R,
 ) -> io::Result<Option<orchard::Bundle<Authorized, ZatBalance>>> {
-    read_v5_bundle(reader, ProofSizeEnforcement::Strict)
+    read_v5_bundle(reader)
 }
 
 pub fn read_value_commitment<R: Read>(mut reader: R) -> io::Result<ValueCommitment> {
@@ -173,7 +170,7 @@ pub fn read_action_without_auth<R: Read>(mut reader: R) -> io::Result<Action<()>
 pub fn read_flags<R: Read>(mut reader: R) -> io::Result<Flags> {
     let mut byte = [0u8; 1];
     reader.read_exact(&mut byte)?;
-    Flags::from_byte(byte[0])
+    Flags::from_byte(byte[0], BundleVersion::orchard_insecure_v1())
         .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "invalid Orchard flags"))
 }
 
@@ -200,7 +197,8 @@ pub fn write_v5_bundle<W: Write>(
             write_action_without_auth(w, a)
         })?;
 
-        writer.write_all(&[bundle.flags().to_byte()])?;
+        writer.write_all(&[bundle.flags().to_byte(bundle.bundle_version())
+            .expect("bundle flags are representable under their own bundle version")])?;
         writer.write_all(&bundle.value_balance().to_i64_le_bytes())?;
         writer.write_all(&bundle.anchor().to_bytes())?;
         Vector::write(
