@@ -23,22 +23,8 @@ pub trait HashSer {
     fn write<W: Write>(&self, writer: W) -> io::Result<()>;
 }
 
-impl HashSer for sapling::Node {
-    fn read<R: Read>(mut reader: R) -> io::Result<Self> {
-        let mut repr = [0u8; 32];
-        reader.read_exact(&mut repr)?;
-        Option::from(Self::from_bytes(repr)).ok_or_else(|| {
-            io::Error::new(
-                io::ErrorKind::InvalidData,
-                "Non-canonical encoding of Jubjub base field value.",
-            )
-        })
-    }
-
-    fn write<W: Write>(&self, mut writer: W) -> io::Result<()> {
-        writer.write_all(&self.to_bytes())
-    }
-}
+// Brave: the `HashSer for sapling::Node` impl is trimmed; only Orchard
+// (`MerkleHashOrchard`) hashing is used by brave-core.
 
 impl HashSer for MerkleHashOrchard {
     fn read<R: Read>(mut reader: R) -> io::Result<Self>
@@ -105,13 +91,7 @@ pub fn read_address<R: Read>(mut reader: R) -> io::Result<Address> {
     Ok(Address::from_parts(level, index))
 }
 
-pub fn read_frontier_v0<H: Hashable + HashSer + Clone, R: Read>(
-    mut reader: R,
-) -> io::Result<Frontier<H, { sapling::NOTE_COMMITMENT_TREE_DEPTH }>> {
-    let tree = read_commitment_tree(&mut reader)?;
-
-    Ok(tree.to_frontier())
-}
+// Brave: `read_frontier_v0` (Sapling-depth frontier) is trimmed.
 
 pub fn write_nonempty_frontier_v1<H: HashSer, W: Write>(
     mut writer: W,

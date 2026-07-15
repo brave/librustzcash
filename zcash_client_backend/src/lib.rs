@@ -50,59 +50,13 @@
 //!                  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 //! ```
 //!
-//! ## Feature flags
-#![doc = document_features::document_features!()]
 //!
 
-#![cfg_attr(docsrs, feature(doc_cfg))]
-#![cfg_attr(docsrs, doc(auto_cfg))]
 // Catch documentation errors caused by code changes.
 #![deny(rustdoc::broken_intra_doc_links)]
 
-pub mod data_api;
-mod decrypt;
-pub mod fees;
-pub mod proposal;
-pub mod proto;
-pub mod scan;
-pub mod scanning;
-pub mod wallet;
-
-#[cfg(any(feature = "sync", feature = "sync-decryptor"))]
-pub mod sync;
-
-#[cfg(feature = "unstable-serialization")]
+// Brave: only the shardtree serialization helpers are used by brave-core's
+// Orchard shard-tree storage. The rest of the crate (data access, scanning,
+// gRPC proto, sapling/transparent support) is trimmed to avoid pulling in the
+// full light-client dependency surface.
 pub mod serialization;
-
-#[cfg(feature = "sync-decryptor")]
-mod task;
-
-#[cfg(feature = "tor")]
-pub mod tor;
-
-pub use decrypt::{DecryptedOutput, TransferType, decrypt_transaction};
-
-#[deprecated(note = "This module is deprecated; use `::zcash_keys::address` instead.")]
-pub mod address {
-    pub use zcash_keys::address::*;
-}
-#[deprecated(note = "This module is deprecated; use `::zcash_keys::encoding` instead.")]
-pub mod encoding {
-    pub use zcash_keys::encoding::*;
-}
-#[deprecated(note = "This module is deprecated; use `::zcash_keys::keys` instead.")]
-pub mod keys {
-    pub use zcash_keys::keys::*;
-}
-#[deprecated(note = "use ::zcash_protocol::PoolType instead")]
-pub type PoolType = zcash_protocol::PoolType;
-#[deprecated(note = "use ::zcash_protocol::ShieldedPool instead")]
-pub type ShieldedPool = zcash_protocol::ShieldedPool;
-#[deprecated(note = "This module is deprecated; use the `zip321` crate instead.")]
-pub mod zip321 {
-    pub use zip321::*;
-}
-
-#[cfg(test)]
-#[macro_use]
-extern crate assert_matches;
